@@ -5,16 +5,18 @@ export const env = createEnv({
   server: {
     DATABASE_URL: z.string().url(),
     NODE_ENV: z.enum(["development", "test", "production"]).default("development"),
+    APP_MODE: z.enum(["dev", "production"]).default("dev"),
 
-    CRAV_SSO_ISSUER: z.string().url().optional(),
-    CRAV_SSO_JWKS_URL: z.string().url().optional(),
+    CRAV_SSO_ISSUER: z.string().optional(),
+    CRAV_SSO_JWKS_URL: z.string().optional(),
+    CRAV_SSO_AUDIENCE: z.string().optional(),
     CRAV_SSO_CLIENT_ID: z.string().optional(),
     CRAV_SSO_CLIENT_SECRET: z.string().optional(),
 
     NEXTAUTH_SECRET: z.string().min(32).optional(),
     NEXTAUTH_URL: z.string().url().optional(),
 
-    AUTH_MODE: z.enum(["sso", "standalone", "hybrid"]).default("hybrid"),
+    AUTH_MODE: z.enum(["sso", "standalone", "hybrid", "dev"]).default("dev"),
 
     CREDITS_API_URL: z.string().url().optional(),
     CREDITS_API_KEY: z.string().optional(),
@@ -35,9 +37,11 @@ export const env = createEnv({
   runtimeEnv: {
     DATABASE_URL: process.env.DATABASE_URL,
     NODE_ENV: process.env.NODE_ENV,
+    APP_MODE: process.env.APP_MODE,
 
     CRAV_SSO_ISSUER: process.env.CRAV_SSO_ISSUER,
     CRAV_SSO_JWKS_URL: process.env.CRAV_SSO_JWKS_URL,
+    CRAV_SSO_AUDIENCE: process.env.CRAV_SSO_AUDIENCE,
     CRAV_SSO_CLIENT_ID: process.env.CRAV_SSO_CLIENT_ID,
     CRAV_SSO_CLIENT_SECRET: process.env.CRAV_SSO_CLIENT_SECRET,
 
