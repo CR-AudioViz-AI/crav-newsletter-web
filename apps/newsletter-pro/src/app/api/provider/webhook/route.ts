@@ -1,57 +1,78 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { createClient } from '@supabase/supabase-js';
-
-const supabase = createClient(
-  process.env.VITE_SUPABASE_URL || 'https://dwglooddbagungmnapye.supabase.co',
-  process.env.VITE_SUPABASE_ANON_KEY || ''
-);
+import {
+  processWebhookEvent,
+  addToDLQ,
+  verifyWebhookSignature,
+  normalizeSESEvent,
+  WebhookEvent,
+} from '@/lib/webhook-processor';
+import { isDevMode } from '@/lib/feature-flags';
 
 export async function POST(req: NextRequest) {
+  const startTime = Date.now();
+
   try {
     const body = await req.json();
-    const { type, sendId, campaignId, email, timestamp, meta = {} } = body;
 
-    console.log(`📨 Webhook received: ${type} for ${sendId}`);
+    if (!isDevMode()) {
+      const signature = req.headers.get('x-amz-sns-signature');
+      const certURL = req.headers.get('x-amz-sns-signing-cert-url');
 
-    if (type === 'delivered') {
-      const { error } = await supabase
-        .from('sends')
-        .update({ status: 'sent', updated_at: new Date().toISOString() })
-        .eq('id', sendId);
+      const isValid = await verifyWebhookSignature(body, signature, certURL);
 
-      if (error) {
-        console.error('Failed to update send status:', error);
+      if (!isValid) {
+        console.error('[Webhook] Signature verification failed');
+        return NextResponse.json(
+          { error: 'Invalid signature' },
+          { status: 401 }
+        );
       }
     }
 
-    const { data: send } = await supabase
-      .from('sends')
-      .select('org_id, subscriber_id')
-      .eq('id', sendId)
-      .single();
-
-    if (send) {
-      const { error } = await supabase
-        .from('email_events')
-        .insert({
-          org_id: send.org_id,
-          campaign_id: campaignId,
-          subscriber_id: send.subscriber_id,
-          type: type === 'click' ? 'click' : type === 'open' ? 'open' : type === 'delivered' ? 'delivered' : type,
-          meta,
-          occurred_at: timestamp || new Date().toISOString(),
-        });
-
-      if (error) {
-        console.error('Failed to insert event:', error);
-      } else {
-        console.log(`✅ Event recorded: ${type}`);
-      }
+    if (body.Type === 'SubscriptionConfirmation') {
+      console.log('[Webhook] SNS subscription confirmation received');
+      return NextResponse.json({ message: 'Subscription confirmed' });
     }
 
-    return NextResponse.json({ received: true });
+    let event: WebhookEvent | null;
+
+    if (body.Type === 'Notification') {
+      event = normalizeSESEvent(body);
+    } else {
+      event = body as WebhookEvent;
+    }
+
+    if (!event) {
+      console.error('[Webhook] Failed to normalize event');
+      return NextResponse.json(
+        { error: 'Invalid event format' },
+        { status: 400 }
+      );
+    }
+
+    await processWebhookEvent(event);
+
+    const duration = Date.now() - startTime;
+    console.log(`[Webhook] Processed in ${duration}ms`);
+
+    return NextResponse.json({ received: true, duration });
   } catch (error) {
-    console.error('Webhook processing error:', error);
-    return NextResponse.json({ error: 'Webhook processing failed' }, { status: 500 });
+    const duration = Date.now() - startTime;
+    console.error('[Webhook] Processing failed:', error);
+
+    try {
+      const body = await req.json();
+      await addToDLQ(body, error as Error);
+    } catch (dlqError) {
+      console.error('[Webhook] DLQ failed:', dlqError);
+    }
+
+    return NextResponse.json(
+      {
+        error: 'Webhook processing failed',
+        duration,
+      },
+      { status: 500 }
+    );
   }
 }
