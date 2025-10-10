@@ -10,7 +10,8 @@
     "typecheck": "tsc --noEmit",
     "prisma:generate": "prisma generate",
     "prisma:migrate": "prisma migrate dev",
-    "prisma:studio": "prisma studio"
+    "prisma:studio": "prisma studio",
+    "seed": "tsx src/lib/seed.ts"
   },
   "dependencies": {
     "@crav/analytics": "file:../../packages/analytics",
