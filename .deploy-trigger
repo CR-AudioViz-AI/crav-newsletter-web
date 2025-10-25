@@ -1,1 +1,1 @@
-Deployed at Saturday, October 25, 2025 - 3:15 PM EST - Fixed monorepo build configuration: install at root, build from apps/newsletter-pro
+Deployed at Saturday, October 25, 2025 - 3:20 PM EST - Added minimal schema.prisma file to fix build
