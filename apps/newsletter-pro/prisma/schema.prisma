@@ -1,0 +1,25 @@
+// Minimal Prisma schema for crav-newsletter-pro
+// This allows the build to complete while migration to Supabase is in progress
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "../node_modules/.prisma/client"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Campaign {
+  id          String   @id @default(uuid())
+  name        String
+  subject     String
+  content     String
+  status      String   @default("draft")
+  userId      String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@map("campaigns")
+}
