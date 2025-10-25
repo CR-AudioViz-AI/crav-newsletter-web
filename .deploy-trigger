@@ -1,1 +1,1 @@
-Deployed at Saturday, October 25, 2025 - 3:05 PM EST - Fixed Vercel root directory to apps/newsletter-pro
+Deployed at Saturday, October 25, 2025 - 3:15 PM EST - Fixed monorepo build configuration: install at root, build from apps/newsletter-pro
