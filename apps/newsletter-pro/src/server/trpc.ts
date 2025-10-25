@@ -1,7 +1,7 @@
 import { initTRPC, TRPCError } from '@trpc/server';
 import { getSession } from '../lib/auth/session';
 import { prisma } from '../lib/prisma';
-import superjson from 'superjson';
+import SuperJSON from 'superjson';
 
 export const createTRPCContext = async () => {
   const session = await getSession();
@@ -9,7 +9,7 @@ export const createTRPCContext = async () => {
 };
 
 const t = initTRPC.context<typeof createTRPCContext>().create({
-  transformer: superjson,
+  transformer: SuperJSON,
   errorFormatter({ shape }) {
     return shape;
   },
