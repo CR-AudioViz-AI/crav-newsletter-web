@@ -11,7 +11,7 @@ export interface SSOSession {
   email: string;
 }
 
-export async function verifySSO JWT(token: string): Promise<SSOSession | null> {
+export async function verifySSOJWT(token: string): Promise<SSOSession | null> {
   if (!env.CRAV_SSO_JWKS_URL || !env.CRAV_SSO_ISSUER) {
     return null;
   }
