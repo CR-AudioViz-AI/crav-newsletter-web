@@ -57,7 +57,7 @@ async function withRetry<T>(
   for (let attempt = 0; attempt < options.maxRetries; attempt++) {
     try {
       return await fn();
-    } catch (error) {
+    } catch (error: unknown) {
       lastError = error as Error;
 
       if (attempt < options.maxRetries - 1) {
@@ -219,7 +219,7 @@ export function normalizeSESEvent(snsMessage: any): WebhookEvent | null {
       providerEventId: messageId,
       meta: message,
     };
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('[Webhook] Failed to normalize SES event:', error);
     return null;
   }
