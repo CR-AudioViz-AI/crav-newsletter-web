@@ -56,7 +56,7 @@ async function fetchWithRetry(
       }
 
       return response;
-    } catch (error) {
+    } catch (error: unknown) {
       lastError = error as Error;
 
       if (attempt < maxRetries - 1) {
@@ -113,7 +113,7 @@ export async function authorizeCredits(
     console.log(`[Credits] Authorized: ${data.authorization_id}`);
 
     return data;
-  } catch (error) {
+  } catch (error: unknown) {
     if (error instanceof CreditsAPIError) {
       throw error;
     }
@@ -162,7 +162,7 @@ export async function commitCredits(
     }
 
     console.log(`[Credits] Committed: ${request.authorization_id}`);
-  } catch (error) {
+  } catch (error: unknown) {
     if (error instanceof CreditsAPIError) {
       throw error;
     }
@@ -211,7 +211,7 @@ export async function revertCredits(
     }
 
     console.log(`[Credits] Reverted: ${request.authorization_id}`);
-  } catch (error) {
+  } catch (error: unknown) {
     if (error instanceof CreditsAPIError) {
       throw error;
     }
