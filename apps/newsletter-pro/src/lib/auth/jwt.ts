@@ -33,7 +33,7 @@ export async function verifySSOJWT(token: string): Promise<SSOSession | null> {
       role: (payload as any).role,
       email: (payload as any).email,
     };
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('JWT verification failed:', error);
     return null;
   }
