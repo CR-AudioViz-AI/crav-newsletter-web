@@ -63,7 +63,7 @@ class Analytics {
         },
         body: JSON.stringify(event),
       });
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('[Analytics] Failed to send event:', error);
     }
   }
