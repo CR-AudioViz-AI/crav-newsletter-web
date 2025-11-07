@@ -180,7 +180,7 @@ export const campaignsRouterSupabase = router({
                 sendId: send.id,
                 campaignId: campaign.id,
               });
-            } catch (error) {
+            } catch (error: unknown) {
               console.error('Send failed:', error);
               await supabase
                 .from('sends')
