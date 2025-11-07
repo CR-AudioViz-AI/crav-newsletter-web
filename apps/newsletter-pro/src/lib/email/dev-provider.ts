@@ -16,7 +16,7 @@ export class DevEmailProvider {
   constructor() {
     try {
       mkdirSync(this.outputDir, { recursive: true });
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Failed to create email output directory:', error);
     }
   }
@@ -40,7 +40,7 @@ ${html}
     try {
       writeFileSync(filePath, fullHtml, 'utf8');
       console.log(`📧 Email written to: ${filePath}`);
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Failed to write email file:', error);
       throw error;
     }
@@ -69,7 +69,7 @@ ${html}
           }),
         });
         console.log(`✅ Simulated: delivered for ${sendId}`);
-      } catch (error) {
+      } catch (error: unknown) {
         console.error('Webhook simulation failed:', error);
       }
     }, 2000);
@@ -93,7 +93,7 @@ ${html}
             }),
           });
           console.log(`👁️  Simulated: open for ${sendId}`);
-        } catch (error) {
+        } catch (error: unknown) {
           console.error('Webhook simulation failed:', error);
         }
       }, 4000);
@@ -119,7 +119,7 @@ ${html}
             }),
           });
           console.log(`🖱️  Simulated: click for ${sendId}`);
-        } catch (error) {
+        } catch (error: unknown) {
           console.error('Webhook simulation failed:', error);
         }
       }, 6000);
