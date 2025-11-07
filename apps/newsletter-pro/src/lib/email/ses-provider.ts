@@ -72,7 +72,7 @@ export async function sendEmail(params: SendEmailParams): Promise<SendEmailResul
       messageId: response.MessageId,
       provider: 'ses',
     };
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('[SES] Send failed:', error);
     throw error;
   }
@@ -100,7 +100,7 @@ export async function verifySESWebhookSignature(
     verifier.update(message);
 
     return verifier.verify(cert, signature, 'base64');
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('[SES] Signature verification failed:', error);
     return false;
   }
